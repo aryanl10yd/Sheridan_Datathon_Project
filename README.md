@@ -1,5 +1,6 @@
-# Sheridan_Datathon_Project - SENTINEL
-Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita. 
+# Sheridan_Datathon_Project
+
+Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita.
 
 ### AI-Powered Vulnerability Intelligence & Mission Assurance
 
