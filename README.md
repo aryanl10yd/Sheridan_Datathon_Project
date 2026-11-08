@@ -1,56 +1,95 @@
-# Sheridan_Datathon_Project
+# Vexcel
 
-Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita.
+Vexcel is a focused scientific investigation and mission-control replay
+for the May 10–11, 2024 geomagnetic storm. It uses the supplied NASA OMNI
+five-minute CSV and does not synthesize missing observations.
 
-### AI-Powered Vulnerability Intelligence & Mission Assurance
+## Run the backend
 
-## Overview
+```bash
+cd backend
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+PYTHONPATH=src uvicorn spaceweather.main:app --reload
+```
 
-Sentinel is an AI-powered vulnerability intelligence platform designed to uncover the hidden relationships, patterns, and indicators within large-scale cybersecurity datasets.
+The API reads `nasa_omni_solar_wind_storms_5min_2010-2026.csv` from the
+repository root. Override it with `SPACEWEATHER_DATASET`. The analysis uses
+three consecutive five-minute samples (15 minutes) below Bz -10 nT or SYM-H
+-100 nT; missing samples break a sustained event.
 
-Traditional vulnerability management systems often rely on prioritization metrics such as CVSS severity scores and EPSS exploitation probabilities to determine which vulnerabilities should be addressed first. While these metrics are valuable, they do not always explain **why a vulnerability is particularly significant, what underlying patterns make it noteworthy, or what broader security implications its characteristics might reveal.**
+## Run the frontend
 
-Sentinel aims to go beyond conventional vulnerability prioritization.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-Powered by IBM Granite and a suite of statistical and machine-learning tools, Sentinel acts as an investigative data agent that examines vulnerability records, identifies unusual patterns, investigates relationships between variables, and translates its discoveries into meaningful, evidence-backed insights.
+Configure a Vite proxy to `/api` to the backend for local development. The
+service defaults to physical Raspberry Pi mode and reports the device as
+disconnected until the authenticated Raspberry Pi Zero W v1.1 client connects.
+Set `HARDWARE_TOKEN` consistently for the backend and device client. The
+frontend keeps the four analysis sections client-side and exposes a shared
+bottom Hardware Control Dock. The dock uses the authenticated
+`/api/hardware/status` endpoint and the
+`/api/hardware/self_test`, `/api/hardware/synchronize`, and
+`/api/hardware/reset` commands; it never accesses GPIO directly.
 
-Rather than simply producing a ranked list of vulnerabilities, Sentinel seeks to answer a more important question:
+## Connect the Raspberry Pi Zero W v1.1
 
-**What is the data telling us, why does it matter, and what can we discover or do because of it?**
+The backend does not connect to the Pi from the browser. Run the device agent
+on the Pi; it opens the authenticated WebSocket that the backend uses for
+heartbeats, LED state, commands, and acknowledgements.
 
-## Our Goal
+1. Make sure the Pi and the backend host can reach each other over the network.
+2. On the backend host, set the shared token before starting FastAPI:
 
-Our goal is to transform vulnerability data into actionable intelligence.
+   ```bash
+   export HARDWARE_TOKEN="use-a-long-random-token"
+   export HARDWARE_MODE=physical
+   cd backend
+   PYTHONPATH=src uvicorn spaceweather.main:app --host 0.0.0.0 --port 8000
+   ```
 
-Sentinel investigates vulnerabilities across multiple dimensions, including severity, exploitation probability, software weaknesses, affected products, historical exploitation signals, and temporal patterns. By connecting these variables, it aims to identify relationships that conventional filtering and prioritization systems might overlook.
+3. On the Pi, install the device dependencies and start the listener. Replace
+   `BACKEND_HOST` with the backend host's LAN hostname or IP address:
 
-Through its Granite-powered investigative agent, users can ask questions about their datasets, investigate specific vulnerabilities, discover statistical outliers, compare different vulnerability populations, and explore potential explanations for unexpected findings.
+   ```bash
+   cd device
+   python3 -m pip install -r requirements.txt
+   python3 device_agent.py \
+     --url ws://BACKEND_HOST:8000 \
+     --token "$HARDWARE_TOKEN" \
+     --listen
+   ```
 
-Every major discovery is intended to be supported by actual records, statistical evidence, and transparent analytical methods.
+   For a physical Pi, do not pass `--simulate`. The agent reports the Pi
+   hostname as its device ID and reads the model from
+   `/proc/device-tree/model`; the dock shows those values after the first
+   heartbeat. If the agent is stopped, the dock changes to disconnected.
 
-The platform is designed to make these findings accessible to both cybersecurity professionals and non-technical decision-makers through interactive visualizations, technical investigations, and clear executive-level explanations.
+## Historical analytics and mission control
 
-## Beyond Vulnerability Prioritization
+The frontend includes a backend-downsampled 2010–2026 SYM-H timeline that
+preserves observed extrema and highlights May 10–11, 2024; the existing
+Bz/SYM-H investigation; and a pairwise-complete Pearson correlation heatmap
+for solar-wind speed, dynamic pressure, IMF Bz GSM, and AE. Correlations are
+associations and do not establish causation.
 
-A central principle behind Sentinel is that **a vulnerability's importance extends beyond its individual severity score.**
+Mission Control provides backend-authoritative row-by-row replay with play,
+pause, reset, step, seek, and 1x/2x/5x/10x playback. Status thresholds are
+demonstration thresholds, not official NOAA classifications.
 
-Its significance can also depend on:
+SAFE MODE CONFIRMATION records a UTC event ID and replay state for one of two
+simulated responses. It never performs electrical switching or spacecraft
+commands. Authorized events are sent to authenticated WebSocket hardware
+clients, where the blue LED indicates authorization.
 
-- The likelihood that attackers will exploit it.
-- The software weaknesses and characteristics associated with it.
-- The products and systems potentially affected.
-- Its relationship with other vulnerabilities.
-- Historical exploitation patterns.
-- The operational importance of the environment in which it exists.
+## Tests
 
-Sentinel investigates these relationships to uncover potential security trends, identify unusual combinations of characteristics, and suggest further avenues of investigation.
-
-Its predictive component also aims to identify vulnerabilities that may become actively exploited, using historical evidence and time-aware machine-learning techniques.
-
-## Mission Assurance and Critical Infrastructure
-
-Sentinel is designed with applications beyond conventional enterprise cybersecurity in mind.
-
-The project explores how vulnerability intelligence could contribute to the security and resilience of mission-critical environments, including aerospace infrastructure, satellite communications, ground operations, and other complex technological systems.
-
-Through its Mission Assurance mode, users can investigate hypothetical infrastructure environments, correlate software inventories with known vulnerability
+```bash
+PYTHONPATH=backend/src pytest -q backend/tests
+cd frontend && npm test
+cd frontend && npm run build
+```
