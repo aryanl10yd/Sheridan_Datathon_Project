@@ -5,13 +5,14 @@ for the May 10–11, 2024 geomagnetic storm. It uses the supplied NASA OMNI
 five-minute CSV and does not synthesize missing observations.
 
 <img width="1520" height="941" alt="Screen Shot 2026-11-08 at 4 34 35 AM" src="https://github.com/user-attachments/assets/0accee1f-0b90-43a8-9fc7-fc5e1a55776e" />
-  
-  
-  
-  
-<img width="1519" height="934" alt="Screen Shot 2026-11-08 at 4 34 12 AM" src="https://github.com/user-attachments/assets/272f4890-23be-4e45-91f1-e4df4870220f" />
 
+Menu open
 
+<img width="1519" height="934" alt="Screen Shot 2026-11-08 at 4 34 25 AM" src="https://github.com/user-attachments/assets/21ebfd08-f027-41a6-a4fd-a654087e3214" />
+
+Mission control
+
+<img width="1519" height="934" alt="Screen Shot 2026-11-08 at 4 34 12 AM" src="https://github.com/user-attachments/assets/483df84e-3a93-4ce8-826c-0d563a439418" />
 
 
 ## Run the backend
