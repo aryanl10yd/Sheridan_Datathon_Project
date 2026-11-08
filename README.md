@@ -1,56 +1,65 @@
-# Sheridan_Datathon_Project
+# Solar Sentinel: Early Warning Space Weather & Grid Defense Console
 
-Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita.
+**Sheridan Datathon 2026** — _NASA Track: Beyond Earth (Problem 1: Uncover the Story in the Stars)_  
+**Created by:** Aryan, Eric, Terry, Rita
 
-### AI-Powered Vulnerability Intelligence & Mission Assurance
+---
 
 ## Overview
 
-Sentinel is an AI-powered vulnerability intelligence platform designed to uncover the hidden relationships, patterns, and indicators within large-scale cybersecurity datasets.
+Modern critical infrastructure—spanning orbital satellite constellations, aviation communications, and high-voltage power transmission grids—is fundamentally vulnerable to extreme space weather. When violent Coronal Mass Ejections (CMEs) impact Earth's magnetosphere, geomagnetically induced currents (GICs) risk catastrophic transformer failure, orbital drag spikes, and satellite telemetry loss.
 
-Traditional vulnerability management systems often rely on prioritization metrics such as CVSS severity scores and EPSS exploitation probabilities to determine which vulnerabilities should be addressed first. While these metrics are valuable, they do not always explain **why a vulnerability is particularly significant, what underlying patterns make it noteworthy, or what broader security implications its characteristics might reveal.**
+**Solar Sentinel** is an end-to-end exploratory space physics intelligence platform paired with a physical **Mission Control Early Warning Hardware Console**.
 
-Sentinel aims to go beyond conventional vulnerability prioritization.
+By analyzing 16 years of high-resolution solar wind telemetry from NASA's OMNI database (1.7+ million records from 2010 to 2026), Solar Sentinel uncovers the critical time-lag relationship between deep-space magnetic field orientations and catastrophic geomagnetic ground collapse. The system translates these discoveries into real-time operational risk indicators and actionable defense recommendations for grid operators and satellite engineers.
 
-Powered by IBM Granite and a suite of statistical and machine-learning tools, Sentinel acts as an investigative data agent that examines vulnerability records, identifies unusual patterns, investigates relationships between variables, and translates its discoveries into meaningful, evidence-backed insights.
+---
 
-Rather than simply producing a ranked list of vulnerabilities, Sentinel seeks to answer a more important question:
+## The Core Data Discovery: The 45-Minute Warning Window
 
-**What is the data telling us, why does it matter, and what can we discover or do because of it?**
+In space weather monitoring, evaluating geomagnetic storms solely by ground-level distortion indices ($SYM\text{-}H$) tells operators what is happening _after_ damage has already commenced.
 
-## Our Goal
+Using the `nasa_omni_solar_wind_storms_5min_2010-2026.csv` dataset, we performed an in-depth exploratory analysis centering on the historic **May 10–11, 2024 Gannon Superstorm**—the most extreme geomagnetic event in over two decades, which reached a peak $SYM\text{-}H$ of **$-497\text{ nT}$** and triggered auroras visible across Ontario.
 
-Our goal is to transform vulnerability data into actionable intelligence.
+### Key Analytical Findings:
 
-Sentinel investigates vulnerabilities across multiple dimensions, including severity, exploitation probability, software weaknesses, affected products, historical exploitation signals, and temporal patterns. By connecting these variables, it aims to identify relationships that conventional filtering and prioritization systems might overlook.
+1. **The $B_z$ Precursor Flaw:** Earth's geomagnetic field points northward. When the interplanetary magnetic field vector ($B_z$) flips strongly southward (negative), magnetic reconnection opens the magnetosphere, funneling energetic solar plasma directly into Earth's field.
+2. **The 30-to-60-Minute Operational Gap:** In the May 2024 event, $B_z$ dropped sharply below **$-30\text{ nT}$** and solar wind velocity surged past **$750\text{ km/s}$** at the L1 Lagrange point **roughly 45 minutes before** the ground-level $SYM\text{-}H$ collapsed past the extreme storm threshold ($-250\text{ nT}$).
+3. **The Multi-Variable Signature:** Extreme storm intensity is not driven by wind speed alone, but by the product of sustained southward $B_z$, solar wind dynamic pressure ($P_{dyn}$), and auroral electrojet energy ($AE$).
 
-Through its Granite-powered investigative agent, users can ask questions about their datasets, investigate specific vulnerabilities, discover statistical outliers, compare different vulnerability populations, and explore potential explanations for unexpected findings.
+This 45-minute precursor window provides the missing operational margin required for preventative infrastructure protection.
 
-Every major discovery is intended to be supported by actual records, statistical evidence, and transparent analytical methods.
+---
 
-The platform is designed to make these findings accessible to both cybersecurity professionals and non-technical decision-makers through interactive visualizations, technical investigations, and clear executive-level explanations.
+## System Architecture
 
-## Beyond Vulnerability Prioritization
+### Running the dashboard
 
-A central principle behind Sentinel is that **a vulnerability's importance extends beyond its individual severity score.**
+```bash
+pip install streamlit pandas plotly
+streamlit run app.py
+```
 
-Its significance can also depend on:
+The dataset `nasa_omni_solar_wind_storms_5min_2010-2026.csv` must be in the repository root. Dark mode is the default; the **Light mode** toggle (top right) is also available as `?light=true` in the URL.
 
-- The likelihood that attackers will exploit it.
-- The software weaknesses and characteristics associated with it.
-- The products and systems potentially affected.
-- Its relationship with other vulnerabilities.
-- Historical exploitation patterns.
-- The operational importance of the environment in which it exists.
+### Hardware console integration (Raspberry Pi)
 
-Sentinel investigates these relationships to uncover potential security trends, identify unusual combinations of characteristics, and suggest further avenues of investigation.
+The Mission Control Simulator never marks a physical confirmation itself. After an operator requests safe-mode authorisation, the app checks a signal file every 2 seconds. Only a file written **after** the request counts as physical confirmation.
 
-Its predictive component also aims to identify vulnerabilities that may become actively exploited, using historical evidence and time-aware machine-learning techniques.
+- Default path: `hardware_confirm.signal` in the repository root
+- Override with the `SENTINEL_HW_SIGNAL` environment variable, for example a path on a share mounted from the Pi
 
-## Mission Assurance and Critical Infrastructure
+Minimal Pi-side example (GPIO button or key switch on pin 17):
 
-Sentinel is designed with applications beyond conventional enterprise cybersecurity in mind.
+```python
+from pathlib import Path
+from signal import pause
+from gpiozero import Button
 
-The project explores how vulnerability intelligence could contribute to the security and resilience of mission-critical environments, including aerospace infrastructure, satellite communications, ground operations, and other complex technological systems.
+SIGNAL = Path("hardware_confirm.signal")
+key = Button(17)
+key.when_pressed = lambda: SIGNAL.touch()
+pause()
+```
 
-Through its Mission Assurance mode, users can investigate hypothetical infrastructure environments, correlate software inventories with known vulnerability
+For rehearsals without the hardware, the simulator offers a clearly labelled software override. It records that **no** physical confirmation took place.

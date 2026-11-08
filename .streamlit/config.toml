@@ -1,0 +1,11 @@
+[theme]
+base = "dark"
+primaryColor = "#47B5FF"
+backgroundColor = "#0B1118"
+secondaryBackgroundColor = "#18232F"
+textColor = "#E8EEF5"
+font = "sans serif"
+
+[client]
+# Hide Streamlit's Deploy button and developer menu items. Error messages are unaffected.
+toolbarMode = "minimal"
