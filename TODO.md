@@ -1,0 +1,15 @@
+# Sentinel Orbital outcomes
+
+- [ ] Inspect available files and IBM Granite Agent Cookbook. Identify actual dataset schemas, missing fields, join keys, coverage and limitations; do not imply absent files were supplied.
+- [ ] Implement efficient, searchable ingestion and raw-description intelligence: preserve original descriptions, extracted characteristics, supporting spans, confidence, official-vs-inferred provenance, incomplete NIST status and unknown information. Clearly label sample records.
+- [x] Implement exploitation momentum using dated evidence, public proof-of-concept claims separately from verified exploitation, changing signals and temporal views; never execute exploit code or fabricate live evidence.
+- [ ] Provide actual statistical analysis with supporting records, cohort sizes and methods; prevent temporal leakage and 2026-scoreboard training; when sufficient historical inputs exist provide temporal validation, baselines, precision, recall, F1, PR-AUC, ROC-AUC and precision/recall at 500, otherwise report unavailable rather than invent results.
+- [ ] Implement distinct Granite-capable specialist roles and supervisor, with routing, parallel execution, bounded retries/timeouts, structured outputs, logging, tool provenance, uncertainty, conflict verification and explicit deterministic demo mode. Do not expose private reasoning or allow untrusted records to override instructions.
+- [x] Provide clearly simulated mission profiles and software inventory, dependency map and confidence-ranked vulnerability matches; make no claims about real NASA, SpaceX or defense systems.
+- [ ] Implement a separate fail-closed simulated authorization workflow: proposed operation, threat review, two distinct authorized humans, device connection and complete audit; reject duplicate, unauthorized, expired, replayed or missing approvals and device communication failures. No agent can approve and no real infrastructure is controlled. Document Pi Zero wired deployment and prototype limitations.
+- [x] Deliver functional command center, threat explorer, conversational agent operations, momentum visualization, mission assurance, interlock and evidence reports with search, filters and relevant investigation details; distinguish real Granite, sample data and simulated device.
+- [ ] Provide application tests, README, architecture, cookbook adaptations, environment example, dependencies, and straightforward setup. Test the running application, numerical output and failure handling; describe incomplete functionality without implying otherwise.
+
+## Delivery status
+
+The missing source CSVs and Granite credentials prevent real dataset evaluation and a live inference test. The offline historical evaluator is not a deployed prediction service. The simulated authorization audit does not retain the full investigation evidence, and demo identities are not proof of two actual people. A physical device and OS-account isolation have not been tested. See README and docs for further limitations.

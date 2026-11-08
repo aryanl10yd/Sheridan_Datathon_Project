@@ -1,0 +1,11 @@
+# Architecture and trust boundaries
+
+Sentinel Orbital is a demonstration, not a flight safety control. It never sends commands to spacecraft, ground stations, launch systems, or production infrastructure.
+
+The React client communicates through same-origin REST APIs via a minimal gateway. The gateway sends interlock routes to a dedicated loopback authorization process and other routes to the separate intelligence process. DuckDB is used for analytical storage, while the simulated interlock maintains its own SQLite state and audit. The services normally share one OS account, so this is process separation, not strong operating-system isolation. The gateway handles approval requests in transit but does not expose them to agents. The intelligence agents only receive vulnerability and simulation context: the approval service and device secret are not exposed as tools. Retrieved descriptions and metadata are untrusted data, not instructions. Claims should carry their record identifier, method, provenance and uncertainty.
+
+The supervisor routes a query to distinct specialist roles and combines their tool-backed observations. Numerical calculations are performed by analytical code rather than a language model. A verifier checks evidence and contradictions before synthesis. When configured, Granite receives untrusted content inside a bounded structured prompt; without suitable configuration, responses are explicitly deterministic demonstrations rather than Granite output. The system does not interpret an agent recommendation as a human approval.
+
+The interlock implements a simulated state machine. Communications loss, invalid or expired authorization, missing approval, and duplicate identity cannot yield a demonstration-approved state. Demonstration PINs and a simulated device are only mechanisms to exercise software behavior. They do not prove distinct physical people or provide production-grade security. See `interlock.md` for exact transitions, authentication boundaries and replay defenses.
+
+DuckDB and SQLite local files are appropriate for a single-machine prototype, not durable shared deployment. Container filesystems may be ephemeral, so a hosted preview is not an archival system. Replace the demo identity system, persistence and device trust model before any real safety use; no physical device has been tested in this environment.

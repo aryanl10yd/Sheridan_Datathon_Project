@@ -1,56 +1,45 @@
-# Sheridan_Datathon_Project
+# Sentinel Orbital
 
-Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita.
+A defensive threat-intelligence and mission-assurance **simulation**. AI may suggest review, and agent tools do not provide approval access. The public demo identities do not prove a human made a decision. This project has no flight, satellite, launch, ground-station, or other infrastructure command interface.
 
-### AI-Powered Vulnerability Intelligence & Mission Assurance
+## Current scope
 
-## Overview
+No vulnerability datasets, IBM Granite credentials, or physical device were supplied with this project. The included demonstration data, timestamps, exploitation signals, mission inventory, operator identities and device are **fictional**. They are not real CVEs, current EPSS or KEV intelligence, actual human authentication, or evidence about a real organization. In the absence of configured Granite inference, the application clearly identifies deterministic demo responses; they are not Granite responses. A trained predictive model and valid evaluation results require suitable timestamped historical data and labels; the application does not invent them. The included historical evaluator is an offline demonstration, not a deployed prediction service. The included interlock is not a certified or production-ready safety or security control.
 
-Sentinel is an AI-powered vulnerability intelligence platform designed to uncover the hidden relationships, patterns, and indicators within large-scale cybersecurity datasets.
+## Run locally
 
-Traditional vulnerability management systems often rely on prioritization metrics such as CVSS severity scores and EPSS exploitation probabilities to determine which vulnerabilities should be addressed first. While these metrics are valuable, they do not always explain **why a vulnerability is particularly significant, what underlying patterns make it noteworthy, or what broader security implications its characteristics might reveal.**
+Requirements: Python 3.10+, Node.js 20+ and npm. From the project directory:
 
-Sentinel aims to go beyond conventional vulnerability prioritization.
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+npm ci
+npm run build
+cp .env.example .env
+cp .env.interlock.example .env.interlock
+./run.sh
+```
 
-Powered by IBM Granite and a suite of statistical and machine-learning tools, Sentinel acts as an investigative data agent that examines vulnerability records, identifies unusual patterns, investigates relationships between variables, and translates its discoveries into meaningful, evidence-backed insights.
+Open `http://127.0.0.1:3000`. The launcher starts a local gateway, an intelligence service, and a separate interlock service. The gateway serves the built frontend and `/api` from the same origin. The services use ports 3000, 8000 and 8001; run one worker. To reload frontend edits, rebuild and restart the service. A container build is also provided: `docker build -t sentinel-orbital .` and `docker run -p 3000:3000 sentinel-orbital`.
 
-Rather than simply producing a ranked list of vulnerabilities, Sentinel seeks to answer a more important question:
+## Configure Granite and datasets
 
-**What is the data telling us, why does it matter, and what can we discover or do because of it?**
+Set the Granite endpoint, model identifier and credentials in `.env` or the process environment; keep interlock PINs and device secrets in the separate `.env.interlock` file; never commit real credentials. See `.env.example` and `docs/agents.md` for supported endpoint conventions. Agent inference is only labeled Granite when a configured service actually returns a valid response. Backend code uses allowlisted read-only tools; approval credentials are not included in agent prompts or agent tools. The services share a host by default and are not protected by OS-account isolation.
 
-## Our Goal
+The named challenge datasets were not included. Put datasets in the configured dataset directory and follow `docs/data.md` for schema, ingestion, provenance, timestamp and evaluation requirements. Dataset schema and temporal availability must be verified before trusting any resulting analysis.
 
-Our goal is to transform vulnerability data into actionable intelligence.
+## Simulated interlock
 
-Sentinel investigates vulnerabilities across multiple dimensions, including severity, exploitation probability, software weaknesses, affected products, historical exploitation signals, and temporal patterns. By connecting these variables, it aims to identify relationships that conventional filtering and prioritization systems might overlook.
+Use the Flight Interlock page to propose a simulated operation, review it, and exercise two distinct demo identities, Alice and Bob. The example PINs are `1111` and `2222`, respectively, and can be configured in `.env.interlock` for local demonstration. They do not establish that two real humans participated. Disconnecting the simulated device causes a hold and does not grant approval. No hardware has been tested here. The gateway, interlock and agent services run as separate processes but normally share a user account and host; this is not OS-level isolation. In the demo, public PINs can be used by anyone or any program. Threat review is advisory and every proposal requires review regardless of its findings. The authorization audit does not retain or cryptographically bind the full agent investigation evidence. For the signed device protocol, state transitions and Raspberry Pi Zero wired-connection assumptions see `docs/interlock.md`.
 
-Through its Granite-powered investigative agent, users can ask questions about their datasets, investigate specific vulnerabilities, discover statistical outliers, compare different vulnerability populations, and explore potential explanations for unexpected findings.
+## Tests and architecture
 
-Every major discovery is intended to be supported by actual records, statistical evidence, and transparent analytical methods.
+```sh
+. .venv/bin/activate
+python -m pytest -q
+npm run build
+python scripts/smoke_test.py
+```
 
-The platform is designed to make these findings accessible to both cybersecurity professionals and non-technical decision-makers through interactive visualizations, technical investigations, and clear executive-level explanations.
-
-## Beyond Vulnerability Prioritization
-
-A central principle behind Sentinel is that **a vulnerability's importance extends beyond its individual severity score.**
-
-Its significance can also depend on:
-
-- The likelihood that attackers will exploit it.
-- The software weaknesses and characteristics associated with it.
-- The products and systems potentially affected.
-- Its relationship with other vulnerabilities.
-- Historical exploitation patterns.
-- The operational importance of the environment in which it exists.
-
-Sentinel investigates these relationships to uncover potential security trends, identify unusual combinations of characteristics, and suggest further avenues of investigation.
-
-Its predictive component also aims to identify vulnerabilities that may become actively exploited, using historical evidence and time-aware machine-learning techniques.
-
-## Mission Assurance and Critical Infrastructure
-
-Sentinel is designed with applications beyond conventional enterprise cybersecurity in mind.
-
-The project explores how vulnerability intelligence could contribute to the security and resilience of mission-critical environments, including aerospace infrastructure, satellite communications, ground operations, and other complex technological systems.
-
-Through its Mission Assurance mode, users can investigate hypothetical infrastructure environments, correlate software inventories with known vulnerability
+See `docs/architecture.md`, `docs/data.md`, `docs/agents.md`, `docs/interlock.md`, and `docs/cookbook-notes.md`. The cookbook notes identify the exact reviewed IBM repository commit, source files and adapted patterns. Local database files and container filesystems are not durable production storage. This is a prototype and must not be relied on for real-world safety decisions.
