@@ -50,16 +50,17 @@ class DisconnectedHardware:
 
 
 class GpioZeroHardware:
-    def __init__(self, green_pin: int = 17, amber_pin: int = 27, red_pin: int = 22) -> None:
-        from gpiozero import LED
-        self.green, self.amber, self.red = LED(green_pin), LED(amber_pin), LED(red_pin)
-        self.blue = LED(23)
+    def __init__(self, green_pin: int = 22, amber_pin: int = 27, red_pin: int = 17, blue_pin: int = 23, buzzer_pin: int = 24) -> None:
+        from gpiozero import Buzzer, LED
+        self.green, self.amber, self.red, self.blue = LED(green_pin), LED(amber_pin), LED(red_pin), LED(blue_pin)
+        self.buzzer = Buzzer(buzzer_pin)
         self.state = LedState(True, False, False)
 
     def set_warning(self, level: str) -> LedState:
         state = SimulatedHardware().set_warning(level)
         for led, enabled in ((self.green, state.green), (self.amber, state.amber), (self.red, state.red), (self.blue, state.blue)):
             led.on() if enabled else led.off()
+        self.buzzer.off()
         self.state = state
         return state
 
@@ -68,5 +69,6 @@ class GpioZeroHardware:
 
     def authorize(self) -> LedState:
         self.blue.on()
+        self.buzzer.on()
         self.state = LedState(self.state.green, self.state.amber, self.state.red, True)
         return self.state
