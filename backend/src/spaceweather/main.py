@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from .config import settings
 from .domain.analytics import Period, activity_summary, correlation_matrix, load_analytics_data
-from .domain.replay import ReplaySample
+from .domain.replay import ReplaySample, classify_geomagnetic_status
 from .domain.replay_engine import ReplayEngine
 from .domain.science import investigate, load_observations, serialize_observations
 from .hardware import DisconnectedHardware, SimulatedHardware
@@ -85,33 +85,45 @@ def replay_state():
 
 
 @app.post("/api/replay/{action}")
-def replay_control(action: str, index: int | None = None, speed: int | None = None):
+async def replay_control(action: str, index: int | None = None, speed: int | None = None):
     if speed is not None:
         if speed not in {1, 2, 5, 10}:
             raise HTTPException(status_code=400, detail="Speed must be 1, 2, 5, or 10")
         replay.speed = speed
     if action == "speed":
-        return replay.state()
+        state = replay.state()
+        await publish_replay_warning(state)
+        return state
     if action == "play":
-        return replay.play()
+        state = replay.play()
+        await publish_replay_warning(state)
+        return state
     if action == "pause":
-        return replay.pause()
+        state = replay.pause()
+        await publish_replay_warning(state)
+        return state
     if action == "reset":
-        return replay.reset()
+        state = replay.reset()
+        await publish_replay_warning(state)
+        return state
     if action == "step":
-        return replay.step()
+        state = replay.step()
+        await publish_replay_warning(state)
+        return state
     if action == "seek" and index is not None:
-        return replay.seek(index)
+        state = replay.seek(index)
+        await publish_replay_warning(state)
+        return state
     raise HTTPException(status_code=400, detail="Invalid replay action")
 
 
 @app.post("/api/replay/classify")
-def replay_classify(request: ReplayRequest, x_hardware_token: str | None = Header(default=None)):
+async def replay_classify(request: ReplayRequest, x_hardware_token: str | None = Header(default=None)):
     if x_hardware_token != settings.hardware_token:
         raise HTTPException(status_code=401, detail="Invalid hardware token")
-    from .domain.replay import classify_geomagnetic_status
     level = classify_geomagnetic_status(ReplaySample(**request.model_dump()))
     state = hardware.set_warning(level)
+    await publish_warning(level, state.__dict__)
     return {"level": level, "leds": state.__dict__}
 
 
@@ -159,6 +171,27 @@ def hardware_status() -> dict:
         "safe_mode": "acknowledged" if leds.get("blue") else "idle",
         "latest_error": last_hardware_error,
     }
+
+
+async def publish_warning(level: str, leds: dict[str, bool]) -> None:
+    if not connected_devices:
+        return
+    message = {"type": "warning_update", "level": level, "leds": leds}
+    disconnected: set[WebSocket] = set()
+    for device in connected_devices:
+        try:
+            await device.send_json(message)
+        except (RuntimeError, WebSocketDisconnect) as error:
+            disconnected.add(device)
+            global last_hardware_error
+            last_hardware_error = str(error)
+    connected_devices.difference_update(disconnected)
+
+
+async def publish_replay_warning(state: dict) -> None:
+    sample = ReplaySample(**state["observation"])
+    leds = hardware.set_warning(state["status"]).__dict__
+    await publish_warning(classify_geomagnetic_status(sample), leds)
 
 
 @app.get("/api/hardware/status")
