@@ -2,55 +2,164 @@
 
 Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita.
 
-### AI-Powered Vulnerability Intelligence & Mission Assurance
+### Vexcel — Space Weather Analytics & Mission Control
 
 ## Overview
 
-Vexcel is an AI-powered vulnerability intelligence platform designed to uncover the hidden relationships, patterns, and indicators within large-scale cybersecurity datasets.
+Vexcel is a focused scientific investigation and mission-control replay platform for the May 10–11, 2024 geomagnetic storm. It uses the supplied NASA OMNI five-minute dataset to investigate solar-wind conditions, geomagnetic disturbances, and their relationship during one of the strongest geomagnetic storms in recent history.
 
-Traditional vulnerability management systems often rely on prioritization metrics such as CVSS severity scores and EPSS exploitation probabilities to determine which vulnerabilities should be addressed first. While these metrics are valuable, they do not always explain **why a vulnerability is particularly significant, what underlying patterns make it noteworthy, or what broader security implications its characteristics might reveal.**
+Geomagnetic storms occur when disturbances in the solar wind interact with Earth's magnetic field. These interactions can affect satellite operations, radio communications, navigation systems, and electrical power infrastructure. Understanding how solar-wind conditions evolve and how Earth's magnetic field responds is important for improving space-weather awareness.
 
-Vexcel aims to go beyond conventional vulnerability prioritization.
+Vexcel aims to make these complex interactions easier to investigate through historical data analysis, interactive visualizations, and mission-control telemetry replay.
 
-Powered by IBM Granite and a suite of statistical and machine-learning tools, Vexcel acts as an investigative data agent that examines vulnerability records, identifies unusual patterns, investigates relationships between variables, and translates its discoveries into meaningful, evidence-backed insights.
+Rather than generating synthetic observations or interpolating missing measurements, Vexcel works directly with the supplied NASA OMNI dataset. Its analysis preserves observed measurements, and missing samples break sustained-event detection.
 
-Rather than simply producing a ranked list of vulnerabilities, Vexcel seeks to answer a more important question:
-
-**What is the data telling us, why does it matter, and what can we discover or do because of it?**
+The platform combines historical space-weather analytics, storm investigation, statistical analysis, and interactive mission-control functionality within a single application.
 
 ## Our Goal
 
-Our goal is to transform vulnerability data into actionable intelligence.
+Our goal is to transform historical space-weather observations into an interactive scientific investigation and operational-awareness experience.
 
-Vexcel investigates vulnerabilities across multiple dimensions, including severity, exploitation probability, software weaknesses, affected products, historical exploitation signals, and temporal patterns. By connecting these variables, it aims to identify relationships that conventional filtering and prioritization systems might overlook.
+Vexcel examines solar-wind and geomagnetic measurements across a historical timeline spanning 2010–2026, with a particular focus on the May 10–11, 2024 Gannon Superstorm.
 
-Through its Granite-powered investigative agent, users can ask questions about their datasets, investigate specific vulnerabilities, discover statistical outliers, compare different vulnerability populations, and explore potential explanations for unexpected findings.
+By investigating parameters such as interplanetary magnetic field (IMF) Bz, solar-wind speed, dynamic pressure, auroral electrojet activity, and SYM-H, the platform explores how solar-wind conditions relate to geomagnetic disturbances.
 
-Every major discovery is intended to be supported by actual records, statistical evidence, and transparent analytical methods.
+The project also introduces a mission-control replay environment that allows users to step through the historical storm observations row by row, monitor changing telemetry, and simulate operator authorization events.
 
-The platform is designed to make these findings accessible to both cybersecurity professionals and non-technical decision-makers through interactive visualizations, technical investigations, and clear executive-level explanations.
+Our objective is to connect scientific data analysis with a more interactive representation of how operators might investigate and respond to significant space-weather events.
 
-## Beyond Vulnerability Prioritization
+## Historical Space-Weather Investigation
 
-A central principle behind Vexcel is that **a vulnerability's importance extends beyond its individual severity score.**
+A central component of Vexcel is its investigation of historical geomagnetic activity.
 
-Its significance can also depend on:
+The platform includes a 2010–2026 SYM-H timeline that provides a broader perspective on geomagnetic disturbances across the available dataset. The visualization highlights the May 10–11, 2024 storm, when SYM-H reached approximately -497 nT.
 
-- The likelihood that attackers will exploit it.
-- The software weaknesses and characteristics associated with it.
-- The products and systems potentially affected.
-- Its relationship with other vulnerabilities.
-- Historical exploitation patterns.
-- The operational importance of the environment in which it exists.
+A dedicated 48-hour investigation examines the relationship between IMF Bz and SYM-H during the event.
 
-Vexcel investigates these relationships to uncover potential security trends, identify unusual combinations of characteristics, and suggest further avenues of investigation.
+IMF Bz represents the north-south component of the interplanetary magnetic field in geocentric solar magnetospheric (GSM) coordinates. Strongly negative Bz conditions can contribute to geomagnetic activity by enabling more effective coupling between the solar wind and Earth's magnetosphere.
 
-Its predictive component also aims to identify vulnerabilities that may become actively exploited, using historical evidence and time-aware machine-learning techniques.
+SYM-H provides a high-resolution measure of geomagnetic disturbances associated with changes in Earth's magnetic field.
 
-## Mission Assurance and Critical Infrastructure
+By comparing these measurements, Vexcel investigates how changes in upstream solar-wind conditions relate to subsequent geomagnetic responses and explores the potential early-warning significance of negative Bz observations.
 
-Vexcel is designed with applications beyond conventional enterprise cybersecurity in mind.
+## Statistical Analysis and Correlation
 
-The project explores how vulnerability intelligence could contribute to the security and resilience of mission-critical environments, including aerospace infrastructure, satellite communications, ground operations, and other complex technological systems.
+Vexcel also includes a correlation heatmap that examines relationships between four important space-weather parameters:
 
-Through its Mission Assurance mode, users can investigate hypothetical infrastructure environments, correlate software inventories with known vulnerability
+- Solar-wind speed.
+- Dynamic pressure.
+- IMF Bz GSM.
+- Auroral electrojet (AE) index.
+
+Using pairwise-complete Pearson correlation, the analysis evaluates linear associations between available observations while accounting for missing values.
+
+These relationships help users investigate how different solar-wind conditions and geomagnetic indicators vary together.
+
+However, correlation does not establish causation. The heatmap is intended to support scientific investigation rather than establish predictive or causal relationships.
+
+## Mission Control and Telemetry Replay
+
+An important feature of Vexcel is its interactive Mission Control environment.
+
+Rather than displaying a predefined animation, the platform performs backend-authoritative, row-by-row replay using the historical NASA OMNI observations.
+
+Operators can interact with the replay through:
+
+- Play and pause controls.
+- Reset and individual-step controls.
+- Timeline seeking.
+- Adjustable playback speeds of 1x, 2x, 5x, and 10x.
+- Live telemetry and operational status indicators.
+
+The system evaluates changing measurements against demonstration thresholds to provide an operational interpretation of geomagnetic conditions.
+
+These indicators include NOMINAL, WARNING, and CRITICAL G5 SUPERSTORM states. The thresholds are intended for demonstration purposes and do not represent official NOAA storm classifications.
+
+By allowing users to navigate the historical event interactively, Mission Control provides a more engaging way to understand how measured space-weather conditions evolved throughout the storm.
+
+## Hardware Integration and Operator Authorization
+
+Vexcel extends its mission-control experience through a physical Raspberry Pi Zero W v1.1 hardware interface.
+
+The project explores how historical telemetry and operator authorization events can be connected to a separate physical device.
+
+Through the SAFE MODE CONFIRMATION mechanism, an operator can authorize one of two simulated responses. The system records a UTC event ID and the corresponding replay state.
+
+Authorized events are transmitted to authenticated Raspberry Pi clients, where a blue LED indicates authorization.
+
+The hardware architecture separates the browser, backend, and physical device. The frontend does not access GPIO directly. Instead, the Raspberry Pi runs a dedicated device agent that establishes an authenticated WebSocket connection with the backend.
+
+This connection supports device heartbeats, LED state updates, commands, and acknowledgements.
+
+The SAFE MODE mechanism is a simulation and does not perform electrical switching, disconnect grid transformers, or issue actual spacecraft commands.
+
+## NASA OMNI Dataset and Data Integrity
+
+Vexcel uses the supplied NASA OMNI five-minute CSV dataset:
+
+`nasa_omni_solar_wind_storms_5min_2010-2026.csv`
+
+The dataset contains historical solar-wind, interplanetary magnetic field, and geomagnetic measurements.
+
+Its columns include:
+
+| Parameter | Description |
+|---|---|
+| `datetime_utc` | UTC observation timestamp |
+| `bt_nT` | Total interplanetary magnetic field magnitude |
+| `bz_gsm_nT` | North-south IMF component in GSM coordinates |
+| `by_gsm_nT` | Y-component of the IMF in GSM coordinates |
+| `speed_km_s` | Solar-wind speed |
+| `density_cm3` | Solar-wind particle density |
+| `temp_K` | Solar-wind plasma temperature |
+| `pressure_nPa` | Solar-wind dynamic pressure |
+| `efield_mV_m` | Convective solar-wind electric field |
+| `ae_nT` | Auroral electrojet index |
+| `al_nT` | Lower auroral electrojet index |
+| `sym_h_nT` | High-resolution geomagnetic disturbance index |
+| `pcn` | Polar Cap North geomagnetic index |
+| `proton_flux_10mev` | Energetic proton flux measurement |
+
+An important design principle is that Vexcel does not synthesize missing observations.
+
+Sustained-event detection uses three consecutive five-minute samples, representing a 15-minute period, below either Bz -10 nT or SYM-H -100 nT. Missing samples break the consecutive observation requirement.
+
+This ensures that missing measurements are not incorrectly treated as continuous observations when identifying sustained geomagnetic conditions.
+
+## Architecture
+
+Vexcel is built around three interconnected components:
+
+**1. Backend and scientific processing**
+
+The backend processes the NASA OMNI dataset, provides historical analytics, evaluates telemetry conditions, and maintains the authoritative mission-control replay state.
+
+It also handles hardware authentication, device status, operator authorization events, and WebSocket communication with connected Raspberry Pi clients.
+
+**2. Interactive frontend**
+
+The frontend provides four client-side analysis sections covering historical space-weather analytics, storm investigation, statistical relationships, and Mission Control.
+
+It also includes a shared Hardware Control Dock that communicates with authenticated backend endpoints for device status and hardware commands.
+
+**3. Raspberry Pi hardware client**
+
+A dedicated Python device agent runs on the Raspberry Pi Zero W v1.1.
+
+It establishes an authenticated WebSocket connection to the backend, reports heartbeats, receives commands, updates the LED state, and acknowledges operations.
+
+This separation keeps physical hardware communication independent of the browser and centralizes device coordination within the backend.
+
+## Running the Project
+
+### Backend
+
+```bash
+cd backend
+
+python -m venv .venv
+. .venv/bin/activate
+
+pip install -r requirements.txt
+
+PYTHONPATH=src uvicorn spaceweather.main:app --reload
