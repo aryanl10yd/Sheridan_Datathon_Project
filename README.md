@@ -1,4 +1,8 @@
-# Vexcel
+# Sheridan_Datathon_Project
+
+Sheridan Datathon Project, made by Aryan, Eric, Terry, Rita.
+
+### Vexcel — Space Weather Analytics & Mission Control
 
 Vexcel is a focused scientific investigation and mission-control replay platform for the May 10–11, 2024 geomagnetic storm. It uses the supplied NASA OMNI five-minute CSV and does not synthesize missing observations.
 
